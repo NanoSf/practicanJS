@@ -13,6 +13,11 @@ parrafo2.classList.add('titulo');
 const parrafo3 = document.createElement('p');
 parrafo3.textContent = '$800 por persona';
 parrafo3.classList.add('precio');
+//! Se puede implementar una funcion al vuelo o un arrow funtion, para pasar parametros necesitamos si o si una de estas dosfunciones
+parrafo3.onclick = function(e){ 
+    console.log(e.target);
+    nuevaFuncion(1);
+};
 
 // crear el div...
 const info = document.createElement('div');
@@ -38,3 +43,7 @@ contenedorCard.appendChild(info);
 // Insertarlo en el HTML...
 const contenedor = document.querySelector('.hacer .contenedor-cards');
 contenedor.appendChild(contenedorCard); // al inicio info
+
+function nuevaFuncion(id){
+    console.log('Desde nueva funcion', id);
+}

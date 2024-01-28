@@ -1,23 +1,24 @@
+
 const resultado = document.querySelector('#resultado');
-const formulario = document.querySelector('#formulario');
 const paginacionDiv = document.querySelector('#paginacion');
 
-const registrosPorPagina = 40;
-let totalPaginas;
-let iterador;
 let paginaActual = 1;
-
+let totalPaginas;
+let iteradorSiguiente;
 
 window.onload = () => {
+    const formulario = document.querySelector('#formulario');
     formulario.addEventListener('submit', validarFormulario);
-}
+    paginacionDiv.addEventListener('click', direccionPaginacion);
+};
 
 function validarFormulario(e) {
     e.preventDefault();
-    
+
     const terminoBusqueda = document.querySelector('#termino').value;
-    
-    if(terminoBusqueda === '' ) {
+
+    if(terminoBusqueda === '') {
+        // mensaje de error
         mostrarAlerta('Agrega un término de búsqueda');
         return;
     }
@@ -25,13 +26,14 @@ function validarFormulario(e) {
     buscarImagenes();
 }
 
+
+// Muestra una alerta de error o correcto
 function mostrarAlerta(mensaje) {
-
-    const existeAlerta = document.querySelector('.bg-red-100');
-
-    if(!existeAlerta) {
+    const alerta = document.querySelector('.bg-red-100');
+    if(!alerta) {
         const alerta = document.createElement('p');
-        alerta.classList.add('bg-red-100', 'border-red-400', 'text-red-700', 'px-4', 'py-3', 'rounded', 'max-w-lg', 'mx-auto', 'mt-6', 'text-center');
+
+        alerta.classList.add('bg-red-100', "border-red-400", "text-red-700", "px-4", "py-3", "rounded",  "max-w-lg", "mx-auto", "mt-6", "text-center" );
     
         alerta.innerHTML = `
             <strong class="font-bold">Error!</strong>
@@ -44,101 +46,94 @@ function mostrarAlerta(mensaje) {
             alerta.remove();
         }, 3000);
     }
-    
-
 }
 
-function buscarImagenes() {
+3961091175
 
-    const termino = document.querySelector('#termino').value;
+// NUEVO: Busca las imagenes en una API
+async function buscarImagenes() {
+    const terminoBusqueda = document.querySelector('#termino').value;
 
-    const key = '';
-    const url = `https://pixabay.com/api/?key=${key}&q=${termino}&per_page=${registrosPorPagina}&page=${paginaActual}`;
+    const key = '1732750-d45b5378879d1e877cd1d35a6';
+    const url = `https://pixabay.com/api/?key=${key}&q=${terminoBusqueda}&per_page=30&page=${paginaActual}`;
 
-    fetch(url)
-        .then(respuesta => respuesta.json())
-        .then(resultado => {
-            totalPaginas = calcularPaginas(resultado.totalHits);
-            mostrarImagenes(resultado.hits);
-        })
+   const respuesta = await fetch(url);
+   const resultado = await respuesta.json()
+   
+   totalPaginas = calcularPaginas(resultado.totalHits);
+
+   // console.log(totalPaginas)
+   mostrarImagenes(resultado.hits);
+   
 }
 
-// Generador que va a registrar la cantidad de elementos de acuerdo a las paginas
-function *crearPaginador(total) {
-    for (let i = 1; i <= total; i++ ) {
-        yield i;
-    }
-}
+function mostrarImagenes(imagenes, paginas ) {
 
-
-function calcularPaginas(total) {
-    return parseInt( Math.ceil( total / registrosPorPagina ));
-}
-
-function mostrarImagenes(imagenes) {
-    // console.log(imagenes);
-    
     while(resultado.firstChild) {
         resultado.removeChild(resultado.firstChild);
     }
 
-    // Iterar sobre el arreglo de imagenes y construir el HTML
     imagenes.forEach( imagen => {
-        const { previewURL, likes, views, largeImageURL } = imagen;
 
+        const { likes, views, previewURL, largeImageURL } = imagen;
         resultado.innerHTML += `
-            <div class="w-1/2 md:w-1/3 lg:w-1/4 p-3 mb-4">
-                <div class="bg-white">
-                    <img class="w-full" src="${previewURL}" >
-
+            <div class="w-1/2 md:w-1/3 lg:w-1/4 mb-4 p-3">
+                <div class="bg-white ">
+                    <img class="w-full" src=${previewURL} alt={tags} />
                     <div class="p-4">
-                        <p class="font-bold"> ${likes} <span class="font-light"> Me Gusta </span> </p>
-                        <p class="font-bold"> ${views} <span class="font-light"> Veces Vista </span> </p>
-
-                        <a 
-                            class="block w-full bg-blue-800 hover:bg-blue-500 text-white uppercase font-bold text-center rounded mt-5 p-1"
-                            href="${largeImageURL}" target="_blank" rel="noopener noreferrer" 
-                        >
-                            Ver Imagen
-                        </a>
+                        <p class="card-text">${likes} Me Gusta</p>
+                        <p class="card-text">${views} Vistas </p>
+        
+                        <a href=${largeImageURL} target="_blank" class="bg-blue-800 w-full p-1 block mt-5 rounded text-center font-bold uppercase hover:bg-blue-500 text-white">Ver Imagen</a>
                     </div>
                 </div>
             </div>
-        `;
-
+            `;
     });
 
-    // Limpiar el paginador previo
-    while(paginacionDiv.firstChild) {
-        paginacionDiv.removeChild(paginacionDiv.firstChild)
+
+    if(!iteradorSiguiente) {
+        crearPaginacion();
     }
+ 
+}
 
-    // Generamos el nuevo HTML
-    imprimirPaginador();
+function crearPaginacion() {
+    // recorrer el iterador
+    iteradorSiguiente = paginaSiguiente(totalPaginas);
+    while( true ) {
+        const { value, done } = iteradorSiguiente.next();
 
+        if(done) return;
+
+        // Crear botón de sig
+        const botonSiguiente = document.createElement('a');
+        botonSiguiente.href = "#";
+        botonSiguiente.dataset.pagina = value;
+        botonSiguiente.textContent = value;
+        botonSiguiente.classList.add('siguiente', 'bg-yellow-400', 'px-4', 'py-1', 'mr-2', 'mx-auto', 'mb-10', 'font-bold', 'uppercase', 'rounded');
+        paginacionDiv.appendChild(botonSiguiente);
+    }
+}
+
+function calcularPaginas(total) {
+    return parseInt( Math.ceil( total / 30 ));
 }
 
 
-function imprimirPaginador() {
-    iterador = crearPaginador(totalPaginas);
+// Crear el generador
+function *paginaSiguiente(total) {
+    console.log(total);
+    for( let i = 1; i <= total; i++) {
+        yield i;
+    }
+}
 
-    while(true) {
-        const { value, done} = iterador.next();
-        if(done) return;
+function direccionPaginacion(e) {
+    if(e.target.classList.contains('siguiente')) {
 
-        // Caso contrario, genera un botón por cada elemento en el generador
-        const boton = document.createElement('a');
-        boton.href = '#';
-        boton.dataset.pagina = value;
-        boton.textContent = value;
-        boton.classList.add('siguiente', 'bg-yellow-400', 'px-4', 'py-1', 'mr-2', 'font-bold', 'mb-4', 'rounded');
-
-        boton.onclick = () => {
-            paginaActual = value;
-
-            buscarImagenes();
-        }
-
-        paginacionDiv.appendChild(boton);
+        paginaActual= Number( e.target.dataset.pagina);
+        buscarImagenes();
+        formulario.scrollIntoView();
     }
 }

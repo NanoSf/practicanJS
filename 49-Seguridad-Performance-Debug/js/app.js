@@ -1,3 +1,6 @@
+// NUEVO: Javascript2img
+
+// 
 const criptomonedasSelect = document.querySelector('#criptomonedas');
 const monedaSelect = document.querySelector('#moneda');
 const formulario = document.querySelector('#formulario');
@@ -37,6 +40,9 @@ function consultarCriptomonedas() {
 // llena el select 
 function selectCriptomonedas(criptomonedas) {
 
+    // NUEVO: 
+    let inicio = performance.now();
+
     criptomonedas.forEach( cripto => {
         const { FullName, Name } = cripto.CoinInfo;
         const option = document.createElement('option');
@@ -46,6 +52,20 @@ function selectCriptomonedas(criptomonedas) {
         criptomonedasSelect.appendChild(option);
     });
 
+    /**
+     
+     *    for(let i = 0; i < criptomonedas.length; i++) {
+        const { FullName, Name } = criptomonedas[i].CoinInfo;
+        const option = document.createElement('option');
+        option.value = Name;
+        option.textContent = FullName;
+        // insertar el HTML
+        criptomonedasSelect.appendChild(option);
+    }
+     */
+
+    const fin  = performance.now();
+    console.log(fin - inicio);
 }
 
 
@@ -64,6 +84,8 @@ function submitFormulario(e) {
         return;
     }
 
+    // nuevo:
+    debugger;
 
     consultarAPI();
 }
@@ -89,6 +111,8 @@ function mostrarAlerta(mensaje) {
 
 function consultarAPI() {
 
+    // NUEVO
+    const inicio = performance.now();
     const { moneda, criptomoneda} = objBusqueda;
 
     const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${criptomoneda}&tsyms=${moneda}`;
@@ -101,6 +125,9 @@ function consultarAPI() {
             mostrarCotizacionHTML(cotizacion.DISPLAY[criptomoneda][moneda]);
         });
 
+    const fin = performance.now();
+
+    console.log(fin - inicio);
 }
 
 function mostrarCotizacionHTML(cotizacion) {

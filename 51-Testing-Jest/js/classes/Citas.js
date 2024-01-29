@@ -1,4 +1,4 @@
-// CLasses
+// Classes
 class Citas {
     constructor() {
         this.citas = []
